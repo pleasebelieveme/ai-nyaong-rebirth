@@ -36,6 +36,35 @@
   margin-right: auto;
 }
 
+.api-status {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.api-status .badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0.5rem;
+}
+
+.api-status .badge.checking {
+  background: linear-gradient(45deg, #ffa726, #ff9800);
+  color: white;
+}
+
+.api-status .badge.connected {
+  background: linear-gradient(45deg, #4caf50, #66bb6a);
+  color: white;
+}
+
+.api-status .badge.error {
+  background: linear-gradient(45deg, #f44336, #ef5350);
+  color: white;
+}
+
 .card {
   padding: 2em;
   margin: 2rem 0;

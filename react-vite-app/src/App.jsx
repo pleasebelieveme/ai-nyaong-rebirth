@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import { Button, Badge, Switch, Slider, Modal, Toast } from '@toss/tds-mobile'
 import { saveAs } from 'file-saver'
 import './App.css'
@@ -9,7 +9,32 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [showAdModal, setShowAdModal] = useState(false)
   const [adWatched, setAdWatched] = useState(false)
+  const [apiStatus, setApiStatus] = useState('checking')
   const fileInputRef = useRef(null)
+
+  // API 상태 확인
+  const checkApiStatus = async () => {
+    try {
+      // Cloud Run이 배포되지 않았으므로 로컬 백엔드 사용
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+      const response = await fetch(`${API_BASE_URL}/api/health`)
+      if (response.ok) {
+        setApiStatus('connected')
+        console.log('✅ API 연결 성공')
+      } else {
+        setApiStatus('error')
+        console.log('❌ API 연결 실패')
+      }
+    } catch (error) {
+      setApiStatus('error')
+      console.log('❌ API 연결 오류:', error)
+    }
+  }
+
+  // 컴포넌트 마운트 시 API 상태 확인
+  React.useEffect(() => {
+    checkApiStatus()
+  }, [])
 
   // 사진 업로드 처리
   const handleImageUpload = (event) => {
@@ -36,43 +61,83 @@ function App() {
     }, 3000)
   }
 
-  // AI 이미지 변환 (Google Nano Banana 시뮬레이션)
+  // AI 이미지 변환 (실제 백엔드 API 호출)
   const handleConvertImage = async () => {
     if (!selectedImage || !adWatched) return
 
     setIsProcessing(true)
     
-    // 실제 AI 변환 시뮬레이션 (3-5초)
-    await new Promise(resolve => setTimeout(resolve, 4000))
-    
-    // 고양이 사진으로 변환된 결과 시뮬레이션
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    const img = new Image()
-    
-    img.onload = () => {
-      canvas.width = img.width
-      canvas.height = img.height
-      ctx.drawImage(img, 0, 0)
+    try {
+      // Convert base64 to blob for API call
+      const response = await fetch(selectedImage)
+      const blob = await response.blob()
       
-      // 간단한 필터 효과로 고양이 느낌 연출
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      const data = imageData.data
+      // Create FormData for API call
+      const formData = new FormData()
+      formData.append('image', blob, 'uploaded-image.jpg')
       
-      for (let i = 0; i < data.length; i += 4) {
-        // RGB 값을 조정하여 고양이 색상 느낌 연출
-        data[i] = Math.min(255, data[i] * 1.2)     // Red
-        data[i + 1] = Math.min(255, data[i + 1] * 0.9) // Green  
-        data[i + 2] = Math.min(255, data[i + 2] * 1.1) // Blue
+      // Call backend API
+      // Cloud Run이 배포되지 않았으므로 로컬 백엔드 사용
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+      const apiResponse = await fetch(`${API_BASE_URL}/api/image/convert`, {
+        method: 'POST',
+        body: formData,
+      })
+      
+      if (!apiResponse.ok) {
+        const errorData = await apiResponse.json()
+        throw new Error(errorData.error?.message || 'API call failed')
       }
       
-      ctx.putImageData(imageData, 0, 0)
-      const convertedDataUrl = canvas.toDataURL('image/jpeg', 0.9)
-      setConvertedImage(convertedDataUrl)
+      const result = await apiResponse.json()
+      
+      if (result.success && result.data.imageData) {
+        // Convert base64 data to data URL
+        const mimeType = result.data.mimeType || 'image/jpeg'
+        const convertedDataUrl = `data:${mimeType};base64,${result.data.imageData}`
+        setConvertedImage(convertedDataUrl)
+        Toast.show('🎉 AI 변환이 완료되었습니다!')
+      } else {
+        throw new Error('No image data received from API')
+      }
+      
+    } catch (error) {
+      console.error('AI conversion error:', error)
+      Toast.show(`❌ 변환 실패: ${error.message}`)
+      
+      // Fallback to simulation if API fails
+      console.log('Falling back to simulation...')
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+      
+      img.onload = () => {
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx.drawImage(img, 0, 0)
+        
+        // 간단한 필터 효과로 고양이 느낌 연출
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const data = imageData.data
+        
+        for (let i = 0; i < data.length; i += 4) {
+          data[i] = Math.min(255, data[i] * 1.2)     // Red
+          data[i + 1] = Math.min(255, data[i + 1] * 0.9) // Green  
+          data[i + 2] = Math.min(255, data[i + 2] * 1.1) // Blue
+        }
+        
+        ctx.putImageData(imageData, 0, 0)
+        const convertedDataUrl = canvas.toDataURL('image/jpeg', 0.9)
+        setConvertedImage(convertedDataUrl)
+        Toast.show('⚠️ API 연결 실패로 시뮬레이션 모드로 실행됩니다.')
+      }
+      
+      img.src = selectedImage
+    } finally {
       setIsProcessing(false)
     }
-    
-    img.src = selectedImage
   }
 
   // 변환된 이미지 다운로드
@@ -97,6 +162,13 @@ function App() {
       <header className="App-header">
         <h1>🐱 AI Cat Photo Studio</h1>
         <p>사진을 업로드하고 보상형 광고를 시청하면 AI가 고양이 사진으로 변환해드립니다!</p>
+        
+        {/* API 상태 표시 */}
+        <div className="api-status">
+          {apiStatus === 'checking' && <Badge>🔄 API 연결 확인 중...</Badge>}
+          {apiStatus === 'connected' && <Badge>✅ API 연결됨</Badge>}
+          {apiStatus === 'error' && <Badge>❌ API 연결 실패</Badge>}
+        </div>
         
         <div className="photo-studio">
           {/* 사진 업로드 섹션 */}
