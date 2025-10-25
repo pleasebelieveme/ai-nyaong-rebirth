@@ -1,0 +1,173 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.App-header {
+  padding: 2rem;
+}
+
+.App-header h1 {
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #646cff, #535bf2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.App-header p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #888;
+}
+
+.card {
+  padding: 2em;
+  margin: 2rem 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.card button {
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #646cff, #535bf2);
+  border: none;
+  padding: 0.8em 1.6em;
+  font-size: 1.1em;
+  border-radius: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(100, 108, 255, 0.3);
+}
+
+.tds-components {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.tds-components h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #646cff;
+}
+
+.component-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.demo-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 300px;
+  justify-content: space-between;
+}
+
+.demo-item span {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.features {
+  margin-top: 3rem;
+  text-align: left;
+  max-width: 600px;
+}
+
+.features h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #646cff;
+}
+
+.features ul {
+  list-style: none;
+  padding: 0;
+}
+
+.features li {
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border-left: 4px solid #646cff;
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+}
+
+.features li:hover {
+  transform: translateX(8px);
+  background: rgba(100, 108, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .card {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .tds-components {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .demo-item {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .features li {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  
+  .features li:hover {
+    background: rgba(100, 108, 255, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  #root {
+    padding: 1rem;
+  }
+  
+  .App-header h1 {
+    font-size: 2.5em;
+  }
+  
+  .card {
+    padding: 1.5em;
+  }
+  
+  .features {
+    margin-top: 2rem;
+  }
+}
+
